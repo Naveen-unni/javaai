@@ -43,7 +43,11 @@ mvn clean package
 
 Run the Project
 Windows
+PowerShell
+java -cp "target/classes;target/dependency/*" com.example.bloodtracking.Main
+CMD
 java -cp target\classes;target\dependency\* com.example.bloodtracking.Main
+
 
 Linux / Mac
 java -cp target/classes:target/dependency/* com.example.bloodtracking.Main
