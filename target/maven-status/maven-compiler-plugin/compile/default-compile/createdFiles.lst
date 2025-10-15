@@ -1,0 +1,5 @@
+com\example\bloodtracking\dao\DonorDAO.class
+com\example\bloodtracking\Main$ErrorResponse.class
+com\example\bloodtracking\model\Donor.class
+com\example\bloodtracking\dao\DatabaseConnection.class
+com\example\bloodtracking\Main.class

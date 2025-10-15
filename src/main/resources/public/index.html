@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blood Tracking System</title>
+    <script src="https://cdn.tailwindcss.com/3.4.14"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold text-center text-red-600 mb-8">Blood Tracking System</h1>
+
+        <!-- Donors Table -->
+        <div class="bg-white shadow-md rounded-lg overflow-hidden mb-8">
+            <h2 class="text-xl font-semibold text-gray-800 p-4">Donors</h2>
+            <div class="overflow-x-auto">
+                <table id="donorsTable" class="w-full">
+                    <thead class="bg-red-500 text-white">
+                        <tr>
+                            <th class="p-3 text-left">ID</th>
+                            <th class="p-3 text-left">Name</th>
+                            <th class="p-3 text-left">Blood Group</th>
+                            <th class="p-3 text-left">Location</th>
+                            <th class="p-3 text-left">Contact Number</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Add Donor Form -->
+        <div class="bg-white shadow-md rounded-lg p-6 mb-8">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Add New Donor</h2>
+            <form id="addForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Name</label>
+                    <input type="text" name="name" required class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-red-500 focus:border-red-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Blood Group</label>
+                    <input type="text" name="bloodGroup" required class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-red-500 focus:border-red-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Location</label>
+                    <input type="text" name="location" required class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-red-500 focus:border-red-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Contact Number</label>
+                    <input type="text" name="contactNumber" required class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-red-500 focus:border-red-500">
+                </div>
+                <button type="submit" class="w-full bg-red-600 text-white font-semibold py-2 rounded-md hover:bg-red-700 transition">Add Donor</button>
+            </form>
+        </div>
+
+        <!-- Search Donors -->
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Search Donors</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Blood Group</label>
+                    <input type="text" id="searchBlood" class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-red-500 focus:border-red-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Location</label>
+                    <input type="text" id="searchLocation" class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-red-500 focus:border-red-500">
+                </div>
+                <div class="flex space-x-4">
+                    <button id="searchBtn" class="flex-1 bg-red-600 text-white font-semibold py-2 rounded-md hover:bg-red-700 transition">Search</button>
+                    <button id="resetBtn" class="flex-1 bg-gray-500 text-white font-semibold py-2 rounded-md hover:bg-gray-600 transition">Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function loadDonors(url = '/donors') {
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    const tbody = document.querySelector('#donorsTable tbody');
+                    tbody.innerHTML = '';
+                    data.forEach(d => {
+                        const tr = document.createElement('tr');
+                        tr.className = 'hover:bg-gray-50';
+                        tr.innerHTML = `
+                            <td class="p-3">${d.id}</td>
+                            <td class="p-3">${d.name}</td>
+                            <td class="p-3">${d.bloodGroup}</td>
+                            <td class="p-3">${d.location}</td>
+                            <td class="p-3">${d.contactNumber}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                })
+                .catch(err => console.error(err));
+        }
+
+        // Initial load
+        loadDonors();
+
+        // Add donor
+        document.getElementById('addForm').addEventListener('submit', e => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const donor = {
+                name: formData.get('name'),
+                bloodGroup: formData.get('bloodGroup'),
+                location: formData.get('location'),
+                contactNumber: formData.get('contactNumber')
+            };
+            fetch('/donors', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(donor)
+            })
+            .then(res => {
+                if (res.ok) {
+                    loadDonors();
+                    e.target.reset();
+                }
+            })
+            .catch(err => console.error(err));
+        });
+
+        // Search
+        document.getElementById('searchBtn').addEventListener('click', () => {
+            const blood = document.getElementById('searchBlood').value.trim();
+            const loc = document.getElementById('searchLocation').value.trim();
+            let url = '/donors/search';
+            if (blood || loc) {
+                const params = new URLSearchParams();
+                if (blood) params.append('bloodGroup', blood);
+                if (loc) params.append('location', loc);
+                url += '?' + params.toString();
+            }
+            loadDonors(url);
+        });
+
+        // Reset to show all
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            document.getElementById('searchBlood').value = '';
+            document.getElementById('searchLocation').value = '';
+            loadDonors();
+        });
+    </script>
+</body>
+</html>
