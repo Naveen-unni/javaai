@@ -28,7 +28,7 @@ class DonorData(BaseModel):
 # ----------------------------
 # Setup Google Gemini LLM
 # ----------------------------
-os.environ["GOOGLE_API_KEY"] = "AIzaSyD6E2uAbpGAhn3ec8PoXENwO_xplvCkCOk"
+os.environ["GOOGLE_API_KEY"] = ""
 
 # Initialize LLM
 llm = GoogleGenerativeAI(model="text-bison-001")  # safe default
